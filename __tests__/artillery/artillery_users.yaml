@@ -1,0 +1,54 @@
+config:
+  target: "http://localhost:3000"
+  plugins:
+    expect: {}
+  phases:
+    - duration: 30
+      arrivalRate: 1
+      maxVusers: 1
+      name: "Teste de API"
+    # - duration: 30
+    #   arrivalRate: 10
+    #   maxVusers: 100
+    #   name: "Teste de Carga"
+    # - duration: 30
+    #   arrivalRate: 100
+    #   maxVusers: 1000
+    #   name: "Teste de Stress"
+
+scenarios:
+  - name: "Testes: POST users, GET users"
+    flow:
+      - log: "POST users"
+      - post:
+          url: "/users"
+          json:
+            username: "teste_username"
+            name: "teste_name"
+            password: "password"
+            email: "teste@gmail.com"
+          capture:
+            - json: "$.username"
+              as: usernameGet
+            - json: "$.name"
+              as: nameGet
+            - json: "$.password"
+              as: passwordGet
+            - json: "$.email"
+              as: emailGet
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: results
+            - equals:
+              - "teste_username"
+              - "{{ name }}"
+            - equals:
+              - "teste_name"
+              - "{{ nameGet }}"
+            - equals:
+              - "password"
+              - "{{ passwordGet }}"
+            - equals:
+              - "teste@gmail.com"
+              - "{{ emailGet }}"
